@@ -1,4 +1,4 @@
-import { findBsArm64ReleaseAsset, findBsArm64ReleaseAssetByName, GithubRelease, newestBsArm64Release, selectBsArm64Release } from "main/services/bs-arm64.service";
+import { findBsArm64ReleaseAsset, findBsArm64ReleaseAssetByName, GithubRelease, newestBsArm64Release, parseBsArm64Result, selectBsArm64Release } from "main/services/bs-arm64.service";
 import { BS_ARM64_FALLBACK_VERSIONS, BsArm64Manifest } from "shared/models/bs-arm64/bs-arm64.model";
 
 jest.mock("electron", () => ({ app: { getPath: () => "", getVersion: () => "0.0.0" } }));
@@ -116,5 +116,22 @@ describe("selectBsArm64Release", () => {
         expect(info.manifest).toBeUndefined();
         // Only 2c was ever built by name; 2e needs a manifest to be offered
         expect(selectBsArm64Release(releases, undefined, "proton-11.0-2e-arm64").match).toBeUndefined();
+    });
+});
+
+describe("parseBsArm64Result", () => {
+    it("returns the result line of a --json run, ignoring log lines around it", () => {
+        const lines = [
+            '{"type": "log", "message": "checking"}',
+            "not json at all",
+            '{"type": "result", "api": 1, "installed": true, "mods": true, "ready": false}',
+            '{"type": "log", "message": "done"}',
+        ];
+        expect(parseBsArm64Result(lines)).toEqual({ type: "result", api: 1, installed: true, mods: true, ready: false });
+    });
+
+    it("is undefined when no result line was printed", () => {
+        expect(parseBsArm64Result(['{"type": "log", "message": "x"}', "error: boom"])).toBeUndefined();
+        expect(parseBsArm64Result([])).toBeUndefined();
     });
 });
