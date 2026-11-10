@@ -11,7 +11,8 @@
  * old way, with BS_ARM64_FALLBACK_VERSIONS as the supported list.
  */
 
-export const BS_ARM64_REPOSITORY = "TheMysticle/bs-arm64";
+// TEST BRANCH: releases from the rebased fork until TheMysticle/bs-arm64 has one
+export const BS_ARM64_REPOSITORY = "denverquane/bs-arm64";
 
 // bs-arm64-manifest.json of a release (DaVarga 0.3.2 and later): what the release was tested with
 export const BS_ARM64_MANIFEST_ASSET = "bs-arm64-manifest.json";
